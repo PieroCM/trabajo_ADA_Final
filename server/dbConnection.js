@@ -13,12 +13,10 @@ const db = new sqlite3.Database('./pedidos.db', (err) => {
 // Función para crear las tablas
 function createTables() {
     db.serialize(() => {
-
         db.run(`
             CREATE TABLE IF NOT EXISTS mesas (
                 idmesa INTEGER PRIMARY KEY AUTOINCREMENT,
-                numero_mesa INTEGER NOT NULL,
-                ubicacion TEXT
+                numero_mesa INTEGER NOT NULL
             )
         `);
 

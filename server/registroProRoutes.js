@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require('express'); 
 const router = express.Router();
 const db = require('./dbConnection');
 const multer = require('multer');
-const path = require('path');
+
 
 // Configuración de Multer para subir imágenes
 const storage = multer.diskStorage({
@@ -64,6 +64,8 @@ router.get('/productos', (req, res) => {
     db.all(getProductosQuery, [], (err, rows) => {
         if (err) {
             res.status(500).json({ success: false, error: 'Error al obtener los productos' });
+        } else if (rows.length === 0) {
+            res.json({ success: true, message: 'No hay data todavía en la tabla Productos', data: [] });
         } else {
             res.json(rows);
         }
@@ -71,3 +73,4 @@ router.get('/productos', (req, res) => {
 });
 
 module.exports = router;
+

@@ -7,7 +7,6 @@ const db = require('./dbConnection');
 router.post('/guardarMesa', (req, res) => {
     const { numero_mesa } = req.body;
 
-    // Validar que numero_mesa esté presente
     if (!numero_mesa) {
         return res.status(400).json({ success: false, error: 'El campo numero_mesa es obligatorio' });
     }

@@ -8,6 +8,7 @@ import RegistroEmp from './components/registroEmp';
 import Opciones from './components/opciones';
 import MenuMant from './components/MenuMant';
 import RegisterPro from './components/registroPro';
+import MantTipoProductos from './components/MantTipoProductos';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/registro" element={<RegistroEmp />} />
         <Route path="/mantenimiento"element={<MenuMant/>} />
         <Route path="/registro_producto"element={<RegisterPro/>} />
+        <Route path="/mantenimiento_tipo_productos"element={<MantTipoProductos/>}/>
       </Routes>
 
     </Router>

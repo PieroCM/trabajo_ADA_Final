@@ -1,8 +1,8 @@
 const express = require('express'); 
 const router = express.Router();
-const db = require('./dbConnection');
+const db = require('../dbConnection');
 // Ruta para guardar una mesa
-router.post('/guardarMesa', (req, res) => {
+router.post('/api/mesa', (req, res) => {
     const { numero_mesa } = req.body;
 
     console.log('POST /guardarMesa - Datos recibidos:', req.body); // Verifica los datos recibidos
@@ -31,7 +31,7 @@ router.post('/guardarMesa', (req, res) => {
 });
 
 // Ruta para obtener la lista de mesas
-router.get('/mesas', (req, res) => {
+router.get('/api/mesa', (req, res) => {
     console.log('GET /mesas - Solicitando lista de mesas'); // Verifica si se llama a esta ruta
 
     const getMesasQuery = `

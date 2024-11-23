@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('./dbConnection'); // Conexión a la base de datos
 
 // Ruta para obtener el reporte de pedidos
-router.get('/reportes/pedidos', (req, res) => {
+router.get('/pedidos', (req, res) => {
     const query = `
         SELECT 
             p.idpedido,

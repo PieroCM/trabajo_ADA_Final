@@ -11,7 +11,7 @@ export default function OpciRepo() {
             <Button
                 type="primary"
                 style={{ marginBottom: '10px', width: '250px' }}
-                onClick={() => navigate('/todos')} // Navegación para reportes de todos los pedidos
+                onClick={() => navigate('/todoreporte')} // Navegación para reportes de todos los pedidos
             >
                 Generar Reporte de Todos los Pedidos
             </Button>

@@ -12,8 +12,8 @@ export default function RegisterMesa() {
         const fetchMesas = async () => {
             try {
                 const response = await axios.get('http://localhost:3001/api/registroMesaRouter/mesas');
-                console.log('Respuesta al cargar mesas:', response.data); // Verifica la respuesta
-                setMesas(response.data);
+                console.log('Respuesta al cargar mesas:', response.data);
+                setMesas(response.data.data); // Accede correctamente a los datos
             } catch (error) {
                 console.error('Error al cargar las mesas:', error);
                 message.error('Error al cargar las mesas');
@@ -21,6 +21,7 @@ export default function RegisterMesa() {
                 setLoading(false);
             }
         };
+        
 
         fetchMesas();
     }, []);

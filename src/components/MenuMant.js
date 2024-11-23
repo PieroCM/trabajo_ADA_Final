@@ -18,9 +18,16 @@ export default function MenuMant() {
             <Button
                 type="primary"
                 style={{ marginBottom: '10px', width: '200px' }}
-                onClick={() => navigate('/mantenimientoMesa')} // Navegación al hacer clic
+                onClick={() => navigate('/registro_mesa')} // Navegación al hacer clic
             >
                 Mantenimiento Mesa
+            </Button>
+            <Button
+                type="primary"
+                style={{ marginBottom: '10px', width: '200px' }}
+                onClick={() => navigate('/mantenimiento_tipo_productos')} // Navegación al hacer clic
+            >
+                Tipo de Productos
             </Button>
             <Button
                 type="default"

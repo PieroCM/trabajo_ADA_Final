@@ -1,89 +1,92 @@
-const express = require('express'); 
+const express = require('express');
 const router = express.Router();
 const db = require('./dbConnection');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
 
+// Ruta de la carpeta donde se guardarán las imágenes
+const IMAGES_DIR = path.join(__dirname, '../imagenesProduct');
+
+// Verificar si la carpeta existe, y si no, crearla
+if (!fs.existsSync(IMAGES_DIR)) {
+    fs.mkdirSync(IMAGES_DIR, { recursive: true });
+    console.log(`Carpeta creada: ${IMAGES_DIR}`);
+}
 
 // Configuración de Multer para subir imágenes
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'imagenesProduct'); // Carpeta para guardar imágenes
+        cb(null, IMAGES_DIR); // Carpeta para guardar imágenes
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`); // Generar un nombre único
     },
 });
-const upload = multer({ storage });
+
+const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/;
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = filetypes.test(file.mimetype);
+
+        if (extname && mimetype) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Solo se permiten archivos de imagen (jpeg, jpg, png, gif)'));
+        }
+    },
+});
 
 // Ruta para guardar un producto
 router.post('/guardarProducto', upload.single('imagen'), (req, res) => {
     const { idtipoproducto, nombre, precio, cantidad } = req.body;
-    const imagen_url = req.file ? `/imagenesProduct/${req.file.filename}` : null;
 
-    // Insertar en la tabla productos
+    console.log('Datos recibidos en el backend:', req.body);
+    console.log('Archivo recibido:', req.file);
+
+    if (!req.file) {
+        console.error('No se ha subido ninguna imagen');
+        return res.status(400).json({ success: false, error: 'No se ha subido ninguna imagen' });
+    }
+
+    const imagen_url = `/imagenesProduct/${req.file.filename}`;
+
     const insertProductoQuery = `
         INSERT INTO productos (idtipoproducto, nombre, precio, imagen_url)
         VALUES (?, ?, ?, ?)
     `;
     db.run(insertProductoQuery, [idtipoproducto, nombre, precio, imagen_url], function (err) {
         if (err) {
+            console.error('Error al insertar el producto:', err);
             res.status(500).json({ success: false, error: 'Error al insertar el producto' });
             return;
         }
 
-        const idProducto = this.lastID; // ID del producto recién insertado
+        const idProducto = this.lastID;
 
-        // Insertar en la tabla stock
         const insertStockQuery = `
             INSERT INTO stock (idproducto, cantidad)
             VALUES (?, ?)
         `;
         db.run(insertStockQuery, [idProducto, cantidad], (err) => {
             if (err) {
+                console.error('Error al insertar en el stock:', err);
                 res.status(500).json({ success: false, error: 'Error al insertar en el stock' });
             } else {
+                console.log('Producto registrado con éxito:', { idProducto, nombre, precio, imagen_url });
                 res.json({ success: true, message: 'Producto registrado con éxito' });
             }
         });
     });
 });
 
-// Ruta para obtener la lista de productos (con INNER JOIN)
-router.get('/productos', (req, res) => {
-    const getProductosQuery = `
-        SELECT 
-            p.idproducto,
-            p.nombre,
-            p.precio,
-            s.cantidad,
-            t.nombre AS descripcion
-        FROM productos p
-        INNER JOIN stock s ON p.idproducto = s.idproducto
-        INNER JOIN tiposdeproducto t ON p.idtipoproducto = t.idtipoproducto
-    `;
-    db.all(getProductosQuery, [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ success: false, error: 'Error al obtener los productos' });
-        } else if (rows.length === 0) {
-            res.json({ success: true, message: 'No hay data todavía en la tabla Productos', data: [] });
-        } else {
-            res.json(rows);
-        }
-    });
-});
 // Ruta para actualizar un producto
 router.put('/actualizarProducto', upload.single('imagen'), (req, res) => {
     const { idproducto, idtipoproducto, nombre, precio, cantidad } = req.body;
 
-    // Mostrar los datos recibidos antes de realizar el UPDATE
-    console.log('Datos recibidos para actualización:', {
-        idproducto,
-        idtipoproducto,
-        nombre,
-        precio,
-        cantidad,
-        imagen_url: req.file ? `/imagenesProduct/${req.file.filename}` : 'Sin cambios (mantener imagen actual)',
-    });
+    console.log('Datos recibidos para actualización:', req.body);
 
     let imagen_url = null;
     if (req.file) {
@@ -119,6 +122,7 @@ router.put('/actualizarProducto', upload.single('imagen'), (req, res) => {
     });
 });
 
+// Ruta para eliminar un producto
 router.delete('/eliminarProducto/:idproducto', (req, res) => {
     const { idproducto } = req.params;
 
@@ -149,6 +153,29 @@ router.delete('/eliminarProducto/:idproducto', (req, res) => {
     });
 });
 
+// Ruta para obtener la lista de productos
+router.get('/productos', (req, res) => {
+    const getProductosQuery = `
+        SELECT 
+            p.idproducto,
+            p.nombre,
+            p.precio,
+            s.cantidad,
+            t.nombre AS descripcion,
+            p.imagen_url
+        FROM productos p
+        INNER JOIN stock s ON p.idproducto = s.idproducto
+        INNER JOIN tiposdeproducto t ON p.idtipoproducto = t.idtipoproducto
+    `;
+    db.all(getProductosQuery, [], (err, rows) => {
+        if (err) {
+            console.error('Error al obtener los productos:', err);
+            res.status(500).json({ success: false, error: 'Error al obtener los productos' });
+        } else {
+            console.log('Productos obtenidos:', rows);
+            res.json(rows);
+        }
+    });
+});
 
 module.exports = router;
-

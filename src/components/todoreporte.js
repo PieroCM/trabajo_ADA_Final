@@ -34,18 +34,23 @@ const ReportesPedidos = () => {
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearchText(value);
-
+    
         const filtered = data.filter((record) => {
-            // Comprobar los campos a buscar
+            // Normalizar la fecha al formato de búsqueda
+            const opcionesFecha = { day: 'numeric', month: 'long', year: 'numeric' };
+            const fechaNormalizada = new Intl.DateTimeFormat('es-ES', opcionesFecha).format(new Date(record.fecha)).toLowerCase();
+    
+            // Comprobar si el texto coincide con fecha, cliente o producto
             return (
-                record.fecha?.toLowerCase().includes(value) ||
+                fechaNormalizada.includes(value) || // Comparar con la fecha formateada
                 record.cliente?.toLowerCase().includes(value) ||
                 record.producto?.toLowerCase().includes(value)
             );
         });
-
+    
         setFilteredData(filtered);
     };
+    
 
     // Configuración de las columnas de la tabla
     const columns = [

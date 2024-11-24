@@ -12,7 +12,6 @@ const pedidoRoutes = require('./pedidoRoutes');
 const app = express();
 const path = require('path');
 const PORT = 3001;
-
 app.use(cors());
 
 app.use(express.json());
@@ -25,13 +24,13 @@ app.use('/api', registroRoutes);
 // Rutas para tipos de producto
 app.use('/api/tipProdRoutes', tipProdRoutes);
 app.use('/api/tiposdeproducto', tipoProductosRoutes);
-
 // Rutas para productos
 app.use('/api/registroProRoutes', registroProRoutes);
 
 app.use( mesaRoutes);
 app.use(reporteRouter);
 app.use('/api/pedidoRoutes',pedidoRoutes)
+
 
 app.use('/imagenesProduct', express.static(path.join(__dirname, '../imagenesProduct')));
 // Iniciar el servidor

@@ -38,9 +38,9 @@ const ReportesPedidos = () => {
         const filtered = data.filter((record) => {
             // Comprobar los campos a buscar
             return (
-                record['p.fecha']?.toLowerCase().includes(value) ||
-                record['p.cliente']?.toLowerCase().includes(value) ||
-                record['pr.nombre']?.toLowerCase().includes(value)
+                record.fecha?.toLowerCase().includes(value) ||
+                record.cliente?.toLowerCase().includes(value) ||
+                record.producto?.toLowerCase().includes(value)
             );
         });
 
@@ -53,22 +53,32 @@ const ReportesPedidos = () => {
             title: 'ID Pedido',
             dataIndex: 'idpedido',
             key: 'idpedido',
+            sorter: (a, b) => a.idpedido - b.idpedido, // Ordenar numéricamente
+            defaultSortOrder: 'ascend', // Orden ascendente por defecto
         },
+        
         {
             title: 'Número de Mesa',
-            dataIndex: 'm.numero_mesa',
-            key: 'm.numero_mesa',
+            dataIndex: 'numero_mesa',
+            key: 'numero_mesa',
         },
         {
             title: 'Fecha',
-            dataIndex: 'p.fecha',
-            key: 'p.fecha',
-            sorter: (a, b) => new Date(a['p.fecha']) - new Date(b['p.fecha']),
+            dataIndex: 'fecha',
+            key: 'fecha',
+            sorter: (a, b) => new Date(a.fecha) - new Date(b.fecha),
+            render: (fecha) => {
+                // Formatear la fecha con Intl.DateTimeFormat
+                const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Intl.DateTimeFormat('es-ES', opciones).format(new Date(fecha));
+                // Ejemplo alternativo (DD/MM/YYYY):
+                // return new Date(fecha).toLocaleDateString('es-ES');
+            },
         },
         {
             title: 'Cliente',
-            dataIndex: 'p.cliente',
-            key: 'p.cliente',
+            dataIndex: 'cliente',
+            key: 'cliente',
         },
         {
             title: 'Empleado',
@@ -78,13 +88,13 @@ const ReportesPedidos = () => {
         },
         {
             title: 'Producto',
-            dataIndex: 'pr.nombre',
-            key: 'pr.nombre',
+            dataIndex: 'producto',
+            key: 'producto',
         },
         {
             title: 'Cantidad',
-            dataIndex: 'dp.cantidad',
-            key: 'dp.cantidad',
+            dataIndex: 'cantidad',
+            key: 'cantidad',
         },
     ];
 

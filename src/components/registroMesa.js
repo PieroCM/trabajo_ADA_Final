@@ -1,58 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Table, message, Empty } from 'antd';
+import { Form, Input, Button, Table, Modal, message } from 'antd';
 import axios from 'axios';
 
 export default function RegisterMesa() {
-    const [mesas, setMesas] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [form] = Form.useForm();
+    const [mesas, setMesas] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    // Cargar mesas al cargar el componente
+    // Cargar mesas al montar el componente
     useEffect(() => {
-        const fetchMesas = async () => {
-            try {
-                const response = await axios.get('http://localhost:3001/api/registroMesaRouter/mesas');
-                console.log('Respuesta al cargar mesas:', response.data); // Verifica la respuesta
-                setMesas(response.data);
-            } catch (error) {
-                console.error('Error al cargar las mesas:', error);
-                message.error('Error al cargar las mesas');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchMesas();
     }, []);
 
+    // Obtener lista de mesas
+    const fetchMesas = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:3001/api/mesa');
+            setMesas(response.data.data || []);
+        } catch (error) {
+            message.error('Error al cargar las mesas');
+            console.error('Error:', error);
+        }
+        setLoading(false);
+    };
+
     // Manejar el envío del formulario
     const onFinish = async (values) => {
-        console.log('Valores enviados al backend:', values); // Verifica los valores enviados
-
+        setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3001/api/registroMesaRouter/guardarMesa', values);
-            console.log('Respuesta al guardar mesa:', response.data); // Verifica la respuesta del servidor
-
-            if (response.data.success) {
-                message.success('Mesa registrada con éxito');
-                form.resetFields();
-                // Verifica si el objeto 'mesa' está presente en la respuesta
-                if (response.data.mesa) {
-                    setMesas(prevMesas => [...prevMesas, response.data.mesa]); // Agregar la nueva mesa
-                } else {
-                    message.error('La respuesta del servidor no contiene la nueva mesa.');
-                }
+            if (editingId) {
+                // Actualizar mesa existente
+                await axios.put(`http://localhost:3001/api/mesa/${editingId}`, values);
+                message.success('Mesa actualizada exitosamente');
             } else {
-                console.error('Error en la respuesta del servidor:', response.data); // Agregar más detalles
-                message.error('Error al registrar la mesa');
+                // Crear nueva mesa
+                const response = await axios.post('http://localhost:3001/api/mesa', values);
+                if (response.data.success) {
+                    message.success('Mesa registrada exitosamente');
+                }
             }
+            setModalVisible(false);
+            form.resetFields();
+            fetchMesas();
+            setEditingId(null);
         } catch (error) {
-            console.error('Error al registrar la mesa:', error.response || error); // Mostrar más detalles del error
-            message.error('Error al registrar la mesa');
+            message.error('Error al procesar la solicitud');
+            console.error('Error:', error);
+        }
+        setLoading(false);
+    };
+
+    // Eliminar mesa
+    const handleDelete = async (id) => {
+        try {
+            await axios.delete(`http://localhost:3001/api/mesa/${id}`);
+            message.success('Mesa eliminada exitosamente');
+            fetchMesas();
+        } catch (error) {
+            message.error('Error al eliminar la mesa');
+            console.error('Error:', error);
         }
     };
 
-    // Columnas para la tabla (eliminamos "ubicación")
+    // Editar mesa
+    const handleEdit = (record) => {
+        setEditingId(record.idmesa);
+        form.setFieldsValue(record);
+        setModalVisible(true);
+    };
+
+    // Columnas para la tabla
     const columns = [
         {
             title: 'ID',
@@ -64,52 +84,72 @@ export default function RegisterMesa() {
             dataIndex: 'numero_mesa',
             key: 'numero_mesa',
         },
+        {
+            title: 'Acciones',
+            key: 'acciones',
+            render: (_, record) => (
+                <span>
+                    <Button type="link" onClick={() => handleEdit(record)}>
+                        Editar
+                    </Button>
+                    <Button
+                        type="link"
+                        danger
+                        onClick={() =>
+                            Modal.confirm({
+                                title: '¿Está seguro de eliminar esta mesa?',
+                                onOk: () => handleDelete(record.idmesa),
+                            })
+                        }
+                    >
+                        Eliminar
+                    </Button>
+                </span>
+            ),
+        },
     ];
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '20px' }}>
-            <div style={{ width: '40%' }}>
-                <h1 style={{ textAlign: 'center' }}>Registro de Mesa</h1>
-                <Form
-                    form={form}
-                    name="registro_mesa"
-                    onFinish={onFinish}
-                    layout="vertical"
+        <div style={{ padding: '24px' }}>
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h1>Gestión de Mesas</h1>
+                <Button
+                    type="primary"
+                    onClick={() => {
+                        setEditingId(null);
+                        form.resetFields();
+                        setModalVisible(true);
+                    }}
                 >
+                    Nueva Mesa
+                </Button>
+            </div>
+
+            <Table columns={columns} dataSource={mesas} rowKey="idmesa" loading={loading} />
+
+            <Modal
+                title={editingId ? 'Editar Mesa' : 'Nueva Mesa'}
+                open={modalVisible}
+                onCancel={() => setModalVisible(false)}
+                footer={null}
+            >
+                <Form form={form} layout="vertical" onFinish={onFinish}>
                     <Form.Item
                         name="numero_mesa"
                         label="Número de Mesa"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, ingrese el número de mesa',
-                            },
-                        ]}
+                        rules={[{ required: true, message: 'Por favor, ingrese el número de mesa' }]}
                     >
-                        <Input placeholder="Número de Mesa" />
+                        <Input />
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-                            Registrar Mesa
+                        <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: 8 }}>
+                            {editingId ? 'Actualizar' : 'Guardar'}
                         </Button>
+                        <Button onClick={() => setModalVisible(false)}>Cancelar</Button>
                     </Form.Item>
                 </Form>
-            </div>
-
-            <div style={{ width: '55%' }}>
-                <h2>Lista de Mesas</h2>
-                {mesas.length > 0 ? (
-                    <Table
-                        dataSource={mesas}
-                        columns={columns}
-                        rowKey={(record) => record.idmesa}
-                        loading={loading}
-                    />
-                ) : (
-                    <Empty description="No hay datos en la tabla de Mesas" />
-                )}
-            </div>
+            </Modal>
         </div>
     );
 }

@@ -25,9 +25,9 @@ export default function Opciones() {
             <Button
                 type="primary"
                 style={{ marginBottom: '10px', width: '200px' }}
-                onClick={() => navigate('/generarReportes')} // Navegación al hacer clic
+                onClick={() => navigate('/opciReportes')} // Navegación al hacer clic
             >
-                Generar Reportes
+                Generar reportes
             </Button>
             <Button
                 type="default"

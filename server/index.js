@@ -6,6 +6,9 @@ const registroRoutes = require('./registroRoutes');
 const tipProdRoutes = require('./tipProdRoutes'); // Importa las rutas para tipos de producto
 const registroProRoutes = require('./registroProRoutes');
 const tipoProductosRoutes = require('./tipoProductosRoutes');
+const mesaRoutes = require('./mesaRoutes');
+const reporteRouter = require('./reporteRouter');
+const pedidoRoutes = require('./pedidoRoutes');
 const app = express();
 const PORT = 3001;
 
@@ -25,6 +28,9 @@ app.use('/api/tiposdeproducto', tipoProductosRoutes);
 // Rutas para productos
 app.use('/api/registroProRoutes', registroProRoutes);
 
+app.use( mesaRoutes);
+app.use(reporteRouter);
+app.use(pedidoRoutes);
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);

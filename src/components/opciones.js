@@ -11,7 +11,7 @@ export default function Opciones() {
             <Button
                 type="primary"
                 style={{ marginBottom: '10px', width: '200px' }}
-                onClick={() => navigate('/tomarPedido')} // Navegación al hacer clic
+                onClick={() => navigate('/pedidos')} // Navegación al hacer clic
             >
                 Tomar Pedido
             </Button>
@@ -32,7 +32,7 @@ export default function Opciones() {
             <Button
                 type="default"
                 style={{ marginTop: '20px', width: '200px' }}
-                onClick={() => navigate('/')} // Navegación al hacer clic en "Salir"
+                onClick={() => navigate(-1)} // Navegación al hacer clic en "Salir"
             >
                 Salir
             </Button>

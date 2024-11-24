@@ -12,7 +12,7 @@ import RegisterMesa from './components/registroMesa';
 import OpciRepo from './components/opciReportes'; 
 import ReportesPedidos from './components/todoreporte';
 import MantTipoProductos from './components/MantTipoProductos';
-
+import RegistroPedidos from './components/registroPedidos';
 
 function App() {
   return (
@@ -23,10 +23,11 @@ function App() {
         <Route path="/registro" element={<RegistroEmp />} />
         <Route path="/mantenimiento"element={<MenuMant/>} />
         <Route path="/registro_producto"element={<RegisterPro/>} />
-        <Route path="/registro_mesa"element={<RegisterMesa/>} />
         <Route path="/opciReportes" element={<OpciRepo />} /> 
         <Route path="/todoreporte" element={<ReportesPedidos/>} />
         <Route path="/mantenimiento_tipo_productos"element={<MantTipoProductos/>}/>
+        <Route path="/mantenimiento-mesa" element={<RegisterMesa />} /> 
+        <Route path="/pedidos" element={<RegistroPedidos />} /> 
       </Routes>
 
     </Router>

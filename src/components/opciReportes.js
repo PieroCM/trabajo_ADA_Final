@@ -16,16 +16,9 @@ export default function OpciRepo() {
                 Generar Reporte de Todos los Pedidos
             </Button>
             <Button
-                type="primary"
-                style={{ marginBottom: '10px', width: '250px' }}
-                onClick={() => navigate('/porFecha')} // Navegación para reportes de pedidos por fecha
-            >
-                Generar Reporte de Pedidos por Fecha
-            </Button>
-            <Button
                 type="default"
                 style={{ marginTop: '20px', width: '250px' }}
-                onClick={() => navigate('/')} // Navegación para salir
+                onClick={() => navigate(-1)} // Navegación para salir
             >
                 Salir
             </Button>

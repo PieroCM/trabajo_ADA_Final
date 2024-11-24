@@ -71,6 +71,84 @@ router.get('/productos', (req, res) => {
         }
     });
 });
+// Ruta para actualizar un producto
+router.put('/actualizarProducto', upload.single('imagen'), (req, res) => {
+    const { idproducto, idtipoproducto, nombre, precio, cantidad } = req.body;
+
+    // Mostrar los datos recibidos antes de realizar el UPDATE
+    console.log('Datos recibidos para actualización:', {
+        idproducto,
+        idtipoproducto,
+        nombre,
+        precio,
+        cantidad,
+        imagen_url: req.file ? `/imagenesProduct/${req.file.filename}` : 'Sin cambios (mantener imagen actual)',
+    });
+
+    let imagen_url = null;
+    if (req.file) {
+        imagen_url = `/imagenesProduct/${req.file.filename}`;
+    }
+
+    const updateProductoQuery = `
+        UPDATE productos
+        SET idtipoproducto = ?, nombre = ?, precio = ?, imagen_url = COALESCE(?, imagen_url)
+        WHERE idproducto = ?
+    `;
+    db.run(updateProductoQuery, [idtipoproducto, nombre, precio, imagen_url, idproducto], function (err) {
+        if (err) {
+            console.error('Error al actualizar el producto:', err);
+            res.status(500).json({ success: false, error: 'Error al actualizar el producto' });
+            return;
+        }
+
+        const updateStockQuery = `
+            UPDATE stock
+            SET cantidad = ?
+            WHERE idproducto = ?
+        `;
+        db.run(updateStockQuery, [cantidad, idproducto], (err) => {
+            if (err) {
+                console.error('Error al actualizar el stock:', err);
+                res.status(500).json({ success: false, error: 'Error al actualizar el stock' });
+            } else {
+                console.log('Producto actualizado con éxito:', { idproducto, nombre, precio, imagen_url });
+                res.json({ success: true, message: 'Producto actualizado con éxito' });
+            }
+        });
+    });
+});
+
+router.delete('/eliminarProducto/:idproducto', (req, res) => {
+    const { idproducto } = req.params;
+
+    console.log('ID del producto a eliminar:', idproducto);
+
+    const deleteStockQuery = `
+        DELETE FROM stock WHERE idproducto = ?
+    `;
+    db.run(deleteStockQuery, [idproducto], (err) => {
+        if (err) {
+            console.error('Error al eliminar el stock:', err);
+            res.status(500).json({ success: false, error: 'Error al eliminar el stock' });
+            return;
+        }
+
+        const deleteProductoQuery = `
+            DELETE FROM productos WHERE idproducto = ?
+        `;
+        db.run(deleteProductoQuery, [idproducto], (err) => {
+            if (err) {
+                console.error('Error al eliminar el producto:', err);
+                res.status(500).json({ success: false, error: 'Error al eliminar el producto' });
+            } else {
+                console.log('Producto eliminado con éxito:', idproducto);
+                res.json({ success: true, message: 'Producto eliminado con éxito' });
+            }
+        });
+    });
+});
+
 
 module.exports = router;
 

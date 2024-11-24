@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export default function Login() {
 
             if (response.data.validation) {
                 // Muestra una notificación con el idEmpleado
-                alert(`Inicio de sesión exitoso.`);
+                alert('Inicio de sesión exitoso');
                 
                 // Guarda el idEmpleado en localStorage
                 localStorage.setItem('idEmpleado', response.data.user.idempleado);
@@ -39,9 +39,6 @@ export default function Login() {
                 <Form
                     name="normal_login"
                     className="login-form"
-                    initialValues={{
-                        remember: true,
-                    }}
                     onFinish={onFinish}
                 >
                     <Form.Item
@@ -70,26 +67,14 @@ export default function Login() {
                             placeholder="Password"
                         />
                     </Form.Item>
-                    <Form.Item>
-                        <Form.Item name="remember" valuePropName="checked" noStyle>
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
-
-                        <button
-                            type="button"
-                            className="login-form-forgot"
-                            onClick={() => alert('Forgot password functionality')}
-                            style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-                        >
-                            Forgot password
-                        </button>
-                    </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: '100%' }}>
                             Inicio sesión
                         </Button>
-                        Or{' '}
+                    </Form.Item>
+                    <div style={{ textAlign: 'center' }}>
+                        <span>Or </span>
                         <button
                             type="button"
                             onClick={() => navigate('/registro')}
@@ -97,7 +82,7 @@ export default function Login() {
                         >
                             Registrate ahora
                         </button>
-                    </Form.Item>
+                    </div>
                 </Form>
             </div>
         </div>

@@ -8,131 +8,136 @@ const { Option } = Select;
 export default function RegisterPro() {
     const [tipos, setTipos] = useState([]);
     const [productos, setProductos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [form] = Form.useForm();
+    const [filteredProductos, setFilteredProductos] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [fileList, setFileList] = useState([]);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [form] = Form.useForm();
 
-    // Cargar tipos de producto al cargar el componente
+    // Obtener tipos de productos
+    const fetchTipos = async () => {
+        try {
+            const response = await axios.get('http://localhost:3001/api/tipProdRoutes/tipos');
+            setTipos(response.data);
+        } catch (error) {
+            console.error('Error al cargar tipos de producto:', error);
+            message.error('Error al cargar los tipos de producto');
+        }
+    };
+
+    // Obtener lista de productos
+    const fetchProductos = async () => {
+        try {
+            const response = await axios.get('http://localhost:3001/api/registroProRoutes/productos');
+            setProductos(response.data);
+            setFilteredProductos(response.data);
+        } catch (error) {
+            console.error('Error al cargar productos:', error);
+            message.error('Error al cargar los productos');
+        }
+    };
+
+    // Cargar datos iniciales
     useEffect(() => {
-        const fetchTipos = async () => {
-            try {
-                const response = await axios.get('http://localhost:3001/api/tipProdRoutes/tipos');
-                setTipos(response.data);
-            } catch (error) {
-                console.error('Error al cargar tipos de producto:', error);
-                message.error('Error al cargar los tipos de producto');
-            }
-        };
-
-        const fetchProductos = async () => {
-            try {
-                const response = await axios.get('http://localhost:3001/api/registroProRoutes/productos');
-                setProductos(response.data);
-            } catch (error) {
-                console.error('Error al cargar productos:', error);
-                message.error('Error al cargar los productos');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTipos();
-        fetchProductos();
+        setLoading(true);
+        Promise.all([fetchTipos(), fetchProductos()]).finally(() => setLoading(false));
     }, []);
 
-    // Manejar el envío del formulario
+    // Guardar o actualizar producto
     const onFinish = async (values) => {
         const formData = new FormData();
-        for (const key in values) {
-            formData.append(key, values[key]);
-        }
+        Object.keys(values).forEach((key) => formData.append(key, values[key]));
         if (fileList.length > 0) {
             formData.append('imagen', fileList[0].originFileObj);
         }
 
-        // Mostrar los datos en consola antes de enviarlos
-        console.log('Datos enviados al backend:', {
-            idtipoproducto: values.idtipoproducto,
-            nombre: values.nombre,
-            precio: values.precio,
-            cantidad: values.cantidad,
-            imagen: fileList.length > 0 ? fileList[0].name : null,
-        });
-
         try {
-            const response = await axios.post('http://localhost:3001/api/registroProRoutes/guardarProducto', formData);
+            const url = selectedProduct
+                ? `http://localhost:3001/api/registroProRoutes/actualizarProducto`
+                : `http://localhost:3001/api/registroProRoutes/guardarProducto`;
+
+            const method = selectedProduct ? 'put' : 'post';
+            if (selectedProduct) formData.append('idproducto', selectedProduct.idproducto);
+
+            const response = await axios[method](url, formData);
             if (response.data.success) {
-                message.success('Producto guardado con éxito');
+                message.success(selectedProduct ? 'Producto actualizado con éxito' : 'Producto guardado con éxito');
                 form.resetFields();
                 setFileList([]);
-                setProductos([...productos, response.data.producto]); // Agregar el producto nuevo
+                setSelectedProduct(null);
+                fetchProductos();
             } else {
-                message.error('Error al guardar el producto');
+                message.error(response.data.error || 'Error al guardar/actualizar el producto');
             }
         } catch (error) {
-            console.error('Error al guardar el producto:', error);
-            message.error('Error al guardar el producto');
+            console.error('Error al guardar/actualizar el producto:', error);
+            message.error('Error al guardar/actualizar el producto');
         }
     };
 
-    // Manejar la subida de imágenes
-    const handleUploadChange = ({ fileList }) => {
-        setFileList(fileList);
-        if (fileList.length > 0) {
-            message.success('Imagen cargada con éxito');
+    // Eliminar producto
+    const handleDelete = async () => {
+        if (!selectedProduct) return;
+
+        try {
+            const response = await axios.delete(`http://localhost:3001/api/registroProRoutes/eliminarProducto/${selectedProduct.idproducto}`);
+            if (response.data.success) {
+                message.success('Producto eliminado con éxito');
+                setSelectedProduct(null);
+                form.resetFields();
+                setFileList([]);
+                fetchProductos();
+            } else {
+                message.error(response.data.error || 'Error al eliminar el producto');
+            }
+        } catch (error) {
+            console.error('Error al eliminar el producto:', error);
+            message.error('Error al eliminar el producto');
         }
     };
 
-    // Columnas para la tabla
+    // Manejar el filtro de búsqueda
+    const handleSearch = (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredData = productos.filter((producto) =>
+            producto.nombre.toLowerCase().includes(searchTerm)
+        );
+        setFilteredProductos(filteredData);
+    };
+
+    // Manejar selección de fila
+    const onRowSelect = (record) => {
+        setSelectedProduct(record);
+        form.setFieldsValue(record);
+    };
+
+    // Limpiar formulario
+    const handleClear = () => {
+        form.resetFields();
+        setSelectedProduct(null);
+        setFileList([]);
+    };
+
+    // Configuración de columnas de la tabla
     const columns = [
-        {
-            title: 'ID',
-            dataIndex: 'idproducto',
-            key: 'idproducto',
-        },
-        {
-            title: 'Nombre',
-            dataIndex: 'nombre',
-            key: 'nombre',
-        },
-        {
-            title: 'Precio',
-            dataIndex: 'precio',
-            key: 'precio',
-        },
-        {
-            title: 'Cantidad',
-            dataIndex: 'cantidad',
-            key: 'cantidad',
-        },
-        {
-            title: 'Descripción',
-            dataIndex: 'descripcion',
-            key: 'descripcion',
-        },
+        { title: 'ID', dataIndex: 'idproducto', key: 'idproducto' },
+        { title: 'Nombre', dataIndex: 'nombre', key: 'nombre' },
+        { title: 'Precio', dataIndex: 'precio', key: 'precio' },
+        { title: 'Cantidad', dataIndex: 'cantidad', key: 'cantidad' },
+        { title: 'Descripción', dataIndex: 'descripcion', key: 'descripcion' },
     ];
 
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '20px' }}>
             <div style={{ width: '40%' }}>
                 <h1 style={{ textAlign: 'center' }}>Registro de Producto</h1>
-                <Form
-                    form={form}
-                    name="registro_producto"
-                    onFinish={onFinish}
-                    layout="vertical"
-                >
+                <Form form={form} name="registro_producto" onFinish={onFinish} layout="vertical">
                     <Form.Item
                         name="idtipoproducto"
                         label="Tipo de Producto"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, seleccione el tipo de producto',
-                            },
-                        ]}
+                        rules={[{ required: true, message: 'Por favor, seleccione el tipo de producto' }]}
                     >
-                        <Select placeholder="Seleccione un tipo">
+                        <Select placeholder="Seleccione un tipo" loading={loading}>
                             {tipos.map((tipo) => (
                                 <Option key={tipo.idtipoproducto} value={tipo.idtipoproducto}>
                                     {tipo.nombre}
@@ -140,81 +145,64 @@ export default function RegisterPro() {
                             ))}
                         </Select>
                     </Form.Item>
-
-                    <Form.Item
-                        name="nombre"
-                        label="Nombre del Producto"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, ingrese el nombre del producto',
-                            },
-                        ]}
-                    >
+                    <Form.Item name="nombre" label="Nombre del Producto" rules={[{ required: true }]}>
                         <Input placeholder="Nombre del Producto" />
                     </Form.Item>
-
-                    <Form.Item
-                        name="precio"
-                        label="Precio"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, ingrese el precio',
-                            },
-                        ]}
-                    >
-                        <Input type="number" placeholder="Precio" />
+                    <Form.Item name="precio" label="Precio" rules={[{ required: true }]}>
+                        <Input placeholder="Precio" />
                     </Form.Item>
-
-                    <Form.Item
-                        name="cantidad"
-                        label="Cantidad"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, ingrese la cantidad',
-                            },
-                        ]}
-                    >
-                        <Input type="number" placeholder="Cantidad" />
+                    <Form.Item name="cantidad" label="Cantidad" rules={[{ required: true }]}>
+                        <Input placeholder="Cantidad" />
                     </Form.Item>
-
-                    <Form.Item
-                        name="imagen"
-                        label="Imagen del Producto"
-                    >
+                    <Form.Item name="imagen" label="Imagen del Producto">
                         <Upload
                             listType="picture"
                             beforeUpload={() => false}
-                            onChange={handleUploadChange}
+                            onChange={(info) => setFileList(info.fileList)}
                             fileList={fileList}
                         >
                             <Button icon={<UploadOutlined />}>Subir Imagen</Button>
                         </Upload>
                     </Form.Item>
 
-                    <Form.Item>
+                    {/* Botones de acciones */}
+                    {!selectedProduct && (
                         <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                             Guardar Producto
                         </Button>
-                    </Form.Item>
+                    )}
+                    {selectedProduct && (
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                            <Button type="primary" htmlType="submit" style={{ flex: 1 }}>
+                                Actualizar Producto
+                            </Button>
+                            <Button danger onClick={handleDelete} style={{ flex: 1 }}>
+                                Eliminar Producto
+                            </Button>
+                        </div>
+                    )}
+                    <Button onClick={handleClear} style={{ marginTop: '10px', width: '100%' }}>
+                        Limpiar
+                    </Button>
                 </Form>
             </div>
-
             <div style={{ width: '55%' }}>
                 <h2>Lista de Productos</h2>
-                {productos.length > 0 ? (
+                <Input placeholder="Buscar productos..." onChange={handleSearch} style={{ marginBottom: '10px' }} />
+                {filteredProductos.length > 0 ? (
                     <Table
-                        dataSource={productos}
+                        dataSource={filteredProductos}
                         columns={columns}
-                        rowKey={(record) => record.idproducto}
-                        loading={loading}
+                        rowKey="idproducto"
+                        onRow={(record) => ({
+                            onClick: () => onRowSelect(record),
+                        })}
                     />
                 ) : (
-                    <Empty description="No hay datos en la tabla Productos" />
+                    <Empty description="No hay datos que coincidan con la búsqueda" />
                 )}
             </div>
         </div>
     );
 }
+

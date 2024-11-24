@@ -10,10 +10,11 @@ const mesaRoutes = require('./mesaRoutes');
 const reporteRouter = require('./reporteRouter');
 const pedidoRoutes = require('./pedidoRoutes');
 const app = express();
+const path = require('path');
 const PORT = 3001;
 
 app.use(cors());
-app.use(cors({ origin: '*' })); 
+
 app.use(express.json());
 
 // Usar rutas de autenticación
@@ -30,7 +31,9 @@ app.use('/api/registroProRoutes', registroProRoutes);
 
 app.use( mesaRoutes);
 app.use(reporteRouter);
-app.use(pedidoRoutes);
+app.use('/api/pedidoRoutes',pedidoRoutes)
+
+app.use('/imagenesProduct', express.static(path.join(__dirname, '../imagenesProduct')));
 // Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);

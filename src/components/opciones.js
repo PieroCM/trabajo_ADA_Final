@@ -32,7 +32,7 @@ export default function Opciones() {
             <Button
                 type="default"
                 style={{ marginTop: '20px', width: '200px' }}
-                onClick={() => navigate(-1)} // Navegación al hacer clic en "Salir"
+                onClick={() => navigate('/')} // Navegación al hacer clic en "Salir"
             >
                 Salir
             </Button>

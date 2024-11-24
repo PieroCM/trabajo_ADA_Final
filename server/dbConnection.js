@@ -13,19 +13,11 @@ const db = new sqlite3.Database('./pedidos.db', (err) => {
 // Función para crear las tablas
 function createTables() {
     db.serialize(() => {
+        
         db.run(`
             CREATE TABLE IF NOT EXISTS mesas (
                 idmesa INTEGER PRIMARY KEY AUTOINCREMENT,
                 numero_mesa INTEGER NOT NULL
-            )
-        `);
-
-        // Crear tabla de Clientes
-        db.run(`
-            CREATE TABLE IF NOT EXISTS clientes (
-                idcliente INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL,
-                telefono TEXT
             )
         `);
 
@@ -62,12 +54,11 @@ function createTables() {
             CREATE TABLE IF NOT EXISTS pedidos (
                 idpedido INTEGER PRIMARY KEY AUTOINCREMENT,
                 idmesa INTEGER,
-                idcliente INTEGER,
+                nombreCliente TEXT NOT NULL,
                 fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 estado TEXT NOT NULL,
                 idempleado INTEGER,
                 FOREIGN KEY (idmesa) REFERENCES mesas(idmesa),
-                FOREIGN KEY (idcliente) REFERENCES clientes(idcliente),
                 FOREIGN KEY (idempleado) REFERENCES empleados(idempleado)
             )
         `);

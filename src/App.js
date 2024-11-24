@@ -28,6 +28,7 @@ function App() {
         <Route path="/mantenimiento_tipo_productos"element={<MantTipoProductos/>}/>
         <Route path="/mantenimiento-mesa" element={<RegisterMesa />} /> 
         <Route path="/pedidos" element={<RegistroPedidos />} /> 
+
       </Routes>
 
     </Router>

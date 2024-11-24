@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Table, Input, message, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const ReportesPedidos = () => {
     const [data, setData] = useState([]);
@@ -50,7 +52,38 @@ const ReportesPedidos = () => {
     
         setFilteredData(filtered);
     };
-    
+
+    // Función para generar el PDF
+    const generatePDF = () => {
+        const doc = new jsPDF();
+
+        // Ordenar datos por idpedido de forma ascendente
+        const sortedData = [...filteredData].sort((a, b) => a.idpedido - b.idpedido);
+
+        // Título del reporte
+        doc.setFontSize(18);
+        doc.text('Reporte de Pedidos', 14, 22);
+
+        // Opciones de tabla
+        const tableData = sortedData.map((record) => [
+            record.idpedido,
+            record.numero_mesa,
+            new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(record.fecha)),
+            record.cliente,
+            `${record.empleado_nombre} ${record.empleado_apellido}`,
+            record.producto,
+            record.cantidad,
+        ]);
+
+        doc.autoTable({
+            head: [['ID Pedido', 'Mesa', 'Fecha', 'Cliente', 'Empleado', 'Producto', 'Cantidad']],
+            body: tableData,
+            startY: 30,
+        });
+
+        // Guardar el archivo
+        doc.save('ReportePedidos.pdf');
+    };
 
     // Configuración de las columnas de la tabla
     const columns = [
@@ -61,7 +94,6 @@ const ReportesPedidos = () => {
             sorter: (a, b) => a.idpedido - b.idpedido, // Ordenar numéricamente
             defaultSortOrder: 'ascend', // Orden ascendente por defecto
         },
-        
         {
             title: 'Número de Mesa',
             dataIndex: 'numero_mesa',
@@ -76,8 +108,6 @@ const ReportesPedidos = () => {
                 // Formatear la fecha con Intl.DateTimeFormat
                 const opciones = { year: 'numeric', month: 'long', day: 'numeric' };
                 return new Intl.DateTimeFormat('es-ES', opciones).format(new Date(fecha));
-                // Ejemplo alternativo (DD/MM/YYYY):
-                // return new Date(fecha).toLocaleDateString('es-ES');
             },
         },
         {
@@ -130,8 +160,15 @@ const ReportesPedidos = () => {
                     <Button
                         type="primary"
                         onClick={() => navigate(-1)} // Navegar a la pantalla principal
+                        style={{ marginRight: '10px' }}
                     >
                         Regresar
+                    </Button>
+                    <Button
+                        type="default"
+                        onClick={generatePDF} // Generar PDF
+                    >
+                        Exportar PDF
                     </Button>
                 </div>
             </div>

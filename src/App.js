@@ -14,6 +14,12 @@ import ReportesPedidos from './components/todoreporte';
 import MantTipoProductos from './components/MantTipoProductos';
 import RegistroPedidos from './components/registroPedidos';
 
+
+import Menu from './components/menu';
+
+
+
+
 function App() {
   return (
     <Router>
@@ -28,7 +34,7 @@ function App() {
         <Route path="/mantenimiento_tipo_productos"element={<MantTipoProductos/>}/>
         <Route path="/mantenimiento-mesa" element={<RegisterMesa />} /> 
         <Route path="/pedidos" element={<RegistroPedidos />} /> 
-
+        <Route path="/menu" element={<Menu />} />
       </Routes>
 
     </Router>

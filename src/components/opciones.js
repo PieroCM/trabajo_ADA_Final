@@ -36,6 +36,15 @@ export default function Opciones() {
             >
                 Salir
             </Button>
+            <Button
+                type="primary"
+                style={{ marginBottom: '10px', width: '200px' }}
+                onClick={() => navigate('/menu')}
+            >
+                Menú
+            </Button>
+			
+			
         </div>
     );
 }

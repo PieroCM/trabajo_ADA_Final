@@ -30,19 +30,20 @@ export default function Opciones() {
                 Generar reportes
             </Button>
             <Button
-                type="default"
-                style={{ marginTop: '20px', width: '200px' }}
-                onClick={() => navigate('/')} // Navegación al hacer clic en "Salir"
-            >
-                Salir
-            </Button>
-            <Button
                 type="primary"
                 style={{ marginBottom: '10px', width: '200px' }}
                 onClick={() => navigate('/menu')}
             >
                 Menú
             </Button>
+            <Button
+                type="default"
+                style={{ marginTop: '20px', width: '200px' }}
+                onClick={() => navigate('/')} // Navegación al hacer clic en "Salir"
+            >
+                Salir
+            </Button>
+            
 			
 			
         </div>

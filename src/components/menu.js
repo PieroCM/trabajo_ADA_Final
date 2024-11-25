@@ -8,7 +8,7 @@ const Menu = () => {
 
     // Cargar las categorías desde el backend
     useEffect(() => {
-        fetch('http://localhost:3001/menu/categories')
+        fetch('http://localhost:3001/api/categories')
             .then(response => response.json())
             .then(data => {
                 setCategories(data);
@@ -22,7 +22,7 @@ const Menu = () => {
     // Cargar los productos desde el backend
     useEffect(() => {
         if (activeCategory !== null) {
-            fetch('http://localhost:3001/menu/products')
+            fetch('http://localhost:3001/api/products')
                 .then(response => response.json())
                 .then(data => {
                     const filteredProducts = data.filter(product => product.idtipoproducto === activeCategory);

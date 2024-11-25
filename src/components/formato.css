@@ -1,0 +1,74 @@
+/* Importa las fuentes Lobster y Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif; /* Fuente principal */
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: center;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/fondo.jpeg'); /* Usa una ruta absoluta desde public */
+/* Ruta de la imagen en public/imagenes */
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px); /* Aplica el desenfoque al fondo */
+    z-index: -1; /* Envía esta capa al fondo */
+}
+
+.form-container {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.8); /* Fondo blanco con transparencia */
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    margin: 50px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-family: 'Lobster', cursive; /* Fuente estilizada para el título */
+    font-size: 32px;
+    color: #ffcc00; /* Amarillo vibrante */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Efecto de sombra */
+    margin: 0 0 20px;
+}
+
+input[type="text"],
+input[type="password"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif; /* Fuente clara */
+    font-size: 14px;
+}
+
+button {
+    font-family: 'Poppins', sans-serif;
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #ffcc00;
+    color: #111111;
+}

@@ -13,8 +13,6 @@ import OpciRepo from './components/opciReportes';
 import ReportesPedidos from './components/todoreporte';
 import MantTipoProductos from './components/MantTipoProductos';
 import RegistroPedidos from './components/registroPedidos';
-
-
 import Menu from './components/menu';
 
 

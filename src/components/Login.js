@@ -11,17 +11,11 @@ export default function Login() {
         const { username, password } = values;
 
         try {
-            // Realiza una solicitud POST al servidor para validar el usuario
             const response = await axios.post('http://localhost:3001/validatePassword', { username, password });
 
             if (response.data.validation) {
-                // Muestra una notificación con el idEmpleado
                 alert('Inicio de sesión exitoso');
-                
-                // Guarda el idEmpleado en localStorage
                 localStorage.setItem('idEmpleado', response.data.user.idempleado);
-
-                // Navega a la página de opciones
                 navigate('/opciones');
             } else {
                 alert('Usuario o contraseña incorrectos. Intente de nuevo.');
@@ -33,14 +27,18 @@ export default function Login() {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ width: 400 }}>
-                <h1 style={{ textAlign: 'center' }}>Login</h1>
-                <Form
-                    name="normal_login"
-                    className="login-form"
-                    onFinish={onFinish}
-                >
+        <div
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh', // Ocupa toda la pantalla
+                flexDirection: 'column',
+            }}
+        >
+            <div style={{ width: 400, background: 'rgba(255, 255, 255, 0.8)', padding: 20, borderRadius: 10 }}>
+                <h1 style={{ textAlign: 'center', color: 'black', fontWeight: 'bold' }}>Login</h1>
+                <Form name="normal_login" className="login-form" onFinish={onFinish}>
                     <Form.Item
                         name="username"
                         rules={[
@@ -78,7 +76,13 @@ export default function Login() {
                         <button
                             type="button"
                             onClick={() => navigate('/registro')}
-                            style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'blue',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                            }}
                         >
                             Registrate ahora
                         </button>

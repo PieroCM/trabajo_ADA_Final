@@ -10,9 +10,7 @@ const mesaRoutes = require('./mesaRoutes');
 const reporteRouter = require('./reporteRouter');
 const pedidoRoutes = require('./pedidoRoutes');
 const app = express();
-
 const menuRoutes = require('./menuRoutes');
-
 const path = require('path');
 const PORT = 3001;
 app.use(cors());
@@ -33,7 +31,7 @@ app.use('/api/registroProRoutes', registroProRoutes);
 app.use( mesaRoutes);
 app.use(reporteRouter);
 app.use('/api/pedidoRoutes',pedidoRoutes)
-app.use(menuRoutes);
+app.use('/menu', menuRoutes);
 
 app.use('/imagenesProduct', express.static(path.join(__dirname, '../imagenesProduct')));
 // Iniciar el servidor

@@ -1,0 +1,34 @@
+/* global.css */
+
+/* Fuente general para toda la página */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif; /* Cambia 'Roboto' si prefieres otra fuente */
+    background: url('./imagenesweb/fondo.webp') no-repeat center center fixed; /* Ruta actualizada */
+    background-size: cover; /* Asegura que el fondo cubra toda la pantalla */
+    backdrop-filter: blur(10px); /* Difuminado del fondo */
+    -webkit-backdrop-filter: blur(10px); /* Compatibilidad para navegadores antiguos */
+    color: #fff; /* Ajusta el color del texto si es necesario */
+}
+
+/* Opcional: Ajustes generales */
+* {
+    box-sizing: border-box;
+}
+
+/* Estilos para títulos y subtítulos */
+h1, h2, h3, .titulo, .subtitulo {
+    color: black; /* Títulos y subtítulos en negro */
+    font-weight: bold; /* En negrita */
+}
+
+/* Opcional: Contenedor principal */
+#main-container {
+    background: rgba(255, 255, 255, 0.8); /* Fondo semitransparente para mejor legibilidad */
+    padding: 20px;
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); /* Sombras para darle un toque profesional */
+}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Card, Row, Col, message, Button, Input } from 'antd';
 import axios from 'axios';
+import '../styles/RegistroPedidos.css';
+
 
 const { Meta } = Card;
 
@@ -150,16 +152,7 @@ export default function RegistroPedidos() {
                     <Menu.Item key="bebidas">Bebidas</Menu.Item>
                 </Menu>
 
-                <div
-                    style={{
-                        marginTop: '20px',
-                        maxHeight: '500px',
-                        overflowY: 'auto',
-                        padding: '10px',
-                        border: '1px solid #ddd',
-                        borderRadius: '5px',
-                    }}
-                >
+                <div className="productos">
                     <Row gutter={[16, 16]}>
                         {productos.length > 0 ? (
                             productos.map((producto) => (
@@ -198,8 +191,8 @@ export default function RegistroPedidos() {
                 </div>
             </div>
 
-            <div style={{ width: '300px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}>
-                <h2 style={{ textAlign: 'center' }}>Pedido - Mesa {mesaSeleccionada}</h2>
+            <div className="mesas-layout">
+            <h2 style={{ textAlign: 'center' }}>Pedido - Mesa {mesaSeleccionada}</h2>
                 <div style={{ display: 'flex', overflowX: 'auto', padding: '10px', gap: '10px' }}>
                     {mesas.map((mesa) => (
                         <Button
@@ -241,7 +234,7 @@ export default function RegistroPedidos() {
                             </div>
                         ))
                     ) : (
-                        <p>No hay productos seleccionados</p>
+                        <p className="no-productos">No hay productos seleccionados</p>
                     )}
                 </div>
 
